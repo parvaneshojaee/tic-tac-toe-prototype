@@ -7,7 +7,6 @@ import {
   CardTitle,
 } from "../ui/card";
 import GameSVG from "../../../public/assets/images/tic. tac.toe..svg";
-// import WinnerSVG from "../../../public/assets/images/winner-ribbon.png";
 import { useToast } from "@/hooks/use-toast";
 
 enum Players {
@@ -28,7 +27,6 @@ function TicTacToe() {
   const [gameState, setGameState] = useState<GameStates>(
     GameStates.NOT_STARTED
   );
-//   const [winner, setWinner] = useState<Players | null>(null);
 
   const moveCount = useMemo(
     () => grid.filter((g) => g !== null).length,
@@ -41,15 +39,14 @@ function TicTacToe() {
     setGrid((prev) => {
       const gridCopy = [...prev];
       gridCopy[index] = playerTurn;
-
-      if (playerTurn === Players.X_PLAYER) {
-        setPlayerTurn(Players.O_PLAYER);
-      } else {
-        setPlayerTurn(Players.X_PLAYER);
-      }
-
       return gridCopy;
     });
+    // Change Player turn
+    if (playerTurn === Players.X_PLAYER) {
+      setPlayerTurn(Players.O_PLAYER);
+    } else {
+      setPlayerTurn(Players.X_PLAYER);
+    }
   };
 
   useEffect(() => {
@@ -67,7 +64,6 @@ function TicTacToe() {
     for (let i = 0; i < lines.length; i++) {
       const [a, b, c] = lines[i];
       if (grid[a] && grid[a] === grid[b] && grid[a] === grid[c]) {
-        // setWinner(grid[a] as Players);
         setGameState(GameStates.OVER);
         toast({
           title:
@@ -77,12 +73,14 @@ function TicTacToe() {
       }
     }
 
+    // It's a draw
     if (moveCount === 9 && gameState !== GameStates.OVER) {
-      setGameState(GameStates.OVER); // It's a draw
+      setGameState(GameStates.OVER); 
     }
   }, [grid, moveCount]);
 
   useEffect(() => {
+    // Computer move
     if (gameState !== GameStates.OVER && playerTurn === Players.O_PLAYER) {
       const timeout = setTimeout(() => {
         let randomNum = Math.floor(Math.random() * 9);
@@ -90,7 +88,7 @@ function TicTacToe() {
           randomNum = Math.floor(Math.random() * 9);
         }
         move(randomNum);
-      }, 1000);
+      }, 500);
 
       return () => clearTimeout(timeout);
     }
@@ -118,16 +116,6 @@ function TicTacToe() {
         <CardFooter className="text-orange-500 text-2xl font-bold">
         {gameState === GameStates.OVER && "Game is Over!"}
         </CardFooter>
-        {/* {gameState === GameStates.OVER && (
-          <CardFooter>
-            <div className="relative w-full flex justify-center items-center">
-              <img src={WinnerSVG} alt="winner" className="w-[400px]" />
-              <span className="absolute text-gray-200 text-xl font-bold">
-                {winner ? `Winner: Player ${winner}` : "It's a draw!"}
-              </span>
-            </div>
-          </CardFooter>
-        )} */}
       </Card>
       <img
         src={GameSVG}
